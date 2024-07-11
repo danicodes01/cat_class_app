@@ -10,5 +10,51 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model User {
+  id            String        @default(cuid()) @id
+  name          String?
+  email         String?       @unique
+  createdAt     DateTime      @default(now()) @map(name: "created_at")
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+  purchases     Purchase[]
+  progress      Progress[]
+  @@map(name: "users")
+}
+
+model LessonPlan {
+  id            String        @default(cuid()) @id
+  name          String
+  description   String
+  priceId       String        @unique
+  price         Float
+  createdAt     DateTime      @default(now()) @map(name: "created_at")
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+  purchases     Purchase[]
+  progress      Progress[]
+  @@map(name: "lesson_plans")
+}
+
+model Purchase {
+  id            String        @default(cuid()) @id
+  userId        String
+  lessonPlanId  String
+  boughtAt      DateTime      @default(now()) @map(name: "bought_at")
+  user          User          @relation(fields: [userId], references: [id])
+  lessonPlan    LessonPlan    @relation(fields: [lessonPlanId], references: [id])
+  @@map(name: "purchases")
+}
+
+model Progress {
+  id            String        @default(cuid()) @id
+  userId        String
+  lessonPlanId  String
+  progress      Float         // Assuming progress is tracked as a percentage
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+  user          User          @relation(fields: [userId], references: [id])
+  lessonPlan    LessonPlan    @relation(fields: [lessonPlanId], references: [id])
+  @@map(name: "progress")
 }
