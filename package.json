@@ -5,6 +5,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
+		"postinstall": "prisma generate",
 		"seed": "ts-node prisma/seed.js",
 		"preview": "vite preview",
 		"test": "npm run test:integration && npm run test:unit",
