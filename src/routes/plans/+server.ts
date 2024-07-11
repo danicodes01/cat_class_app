@@ -14,7 +14,6 @@ export const GET: RequestHandler = async () => {
         },
       },
     });
-    console.log(plans);
     return json(plans, { status: 200 });
   } catch (error) {
     return json({ error: 'Failed to fetch plans' }, { status: 500 });
