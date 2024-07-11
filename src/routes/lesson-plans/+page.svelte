@@ -1,4 +1,3 @@
-<!-- src/routes/learning-plans/+page.svelte -->
 <script lang="ts">
     let features = [
       { name: 'Basic customer support', availableIn: ['free', 'standard', 'pro'] },
@@ -98,4 +97,3 @@
       {/each}
     </div>
   </main>
-  

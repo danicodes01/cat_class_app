@@ -13,15 +13,16 @@ datasource db {
   url = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
-
 model User {
-  id            String        @default(cuid()) @id
+  id            String       @default(cuid()) @id
   name          String?
-  email         String?       @unique
-  createdAt     DateTime      @default(now()) @map(name: "created_at")
-  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
-  purchases     Purchase[]
+  email         String?      @unique
+  password      String
+  createdAt     DateTime     @default(now()) @map(name: "created_at")
+  updatedAt     DateTime     @updatedAt @map(name: "updated_at")
+  subscriptions Subscription[]
   progress      Progress[]
+  purchases     Purchase[]
   @@map(name: "users")
 }
 
@@ -29,32 +30,72 @@ model LessonPlan {
   id            String        @default(cuid()) @id
   name          String
   description   String
-  priceId       String        @unique
+  planType      String
+  priceId       String?       @unique
+  endpoint      String        @unique
+  image         String
   price         Float
   createdAt     DateTime      @default(now()) @map(name: "created_at")
   updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+  features      LessonPlanFeature[]
   purchases     Purchase[]
+  subscriptions Subscription[]
   progress      Progress[]
   @@map(name: "lesson_plans")
 }
 
-model Purchase {
-  id            String        @default(cuid()) @id
+model Feature {
+  id            String       @default(cuid()) @id
+  name          String
+  planTypes     String[]
+  lessonPlans   LessonPlanFeature[]
+  createdAt     DateTime     @default(now()) @map(name: "created_at")
+  updatedAt     DateTime     @updatedAt @map(name: "updated_at")
+  @@map(name: "features")
+}
+
+model LessonPlanFeature {
+  lessonPlan    LessonPlan @relation(fields: [lessonPlanId], references: [id])
+  lessonPlanId  String
+  feature       Feature    @relation(fields: [featureId], references: [id])
+  featureId     String
+  @@id([lessonPlanId, featureId])
+}
+
+model Subscription {
+  id            String       @default(cuid()) @id
   userId        String
   lessonPlanId  String
-  boughtAt      DateTime      @default(now()) @map(name: "bought_at")
-  user          User          @relation(fields: [userId], references: [id])
-  lessonPlan    LessonPlan    @relation(fields: [lessonPlanId], references: [id])
-  @@map(name: "purchases")
+  startDate     DateTime
+  endDate       DateTime?
+  createdAt     DateTime     @default(now()) @map(name: "created_at")
+  updatedAt     DateTime     @updatedAt @map(name: "updated_at")
+  user          User         @relation(fields: [userId], references: [id])
+  lessonPlan    LessonPlan   @relation(fields: [lessonPlanId], references: [id])
+  @@map(name: "subscriptions")
 }
 
 model Progress {
-  id            String        @default(cuid()) @id
+  id                String       @default(cuid()) @id
+  userId            String
+  lessonPlanId      String
+  completed         Boolean      @default(false)
+  progressPercentage Int         @default(0)
+  createdAt         DateTime     @default(now()) @map(name: "created_at")
+  updatedAt         DateTime     @updatedAt @map(name: "updated_at")
+  user              User         @relation(fields: [userId], references: [id])
+  lessonPlan        LessonPlan   @relation(fields: [lessonPlanId], references: [id])
+  @@map(name: "progress")
+}
+
+model Purchase {
+  id            String       @default(cuid()) @id
   userId        String
   lessonPlanId  String
-  progress      Float         // Assuming progress is tracked as a percentage
-  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
-  user          User          @relation(fields: [userId], references: [id])
-  lessonPlan    LessonPlan    @relation(fields: [lessonPlanId], references: [id])
-  @@map(name: "progress")
+  purchaseDate  DateTime     @default(now())
+  createdAt     DateTime     @default(now()) @map(name: "created_at")
+  updatedAt     DateTime     @updatedAt @map(name: "updated_at")
+  user          User         @relation(fields: [userId], references: [id])
+  lessonPlan    LessonPlan   @relation(fields: [lessonPlanId], references: [id])
+  @@map(name: "purchases")
 }
