@@ -1,7 +1,16 @@
 <script lang="ts">
     import type { ActionData } from './$types';
     import { enhance } from '$app/forms';
+    import { onMount } from 'svelte';
+
     export let form: ActionData;
+
+    onMount(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('redirect')) {
+            sessionStorage.setItem('redirect', params.get('redirect'));
+        }
+    });
 </script>
 
 <h1 class="text-3xl font-bold text-center text-violet-400 mb-6">Login</h1>

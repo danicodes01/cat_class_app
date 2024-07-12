@@ -1,46 +1,48 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import Step from './Step.svelte';
 
+	// Define the Step interface
 	interface Step {
 		name: string;
 		icon: string;
 		href?: string;
 	}
 
+	// Define the steps array
 	let steps: Step[] = [
-		{
-			name: 'Lesson Plans',
-			icon: 'fa-solid fa-list-check',
-			href: 'lesson-plans'
-		},
-		{
-			name: 'CatClass Store',
-			icon: 'fa-solid fa-cart-shopping'
-		},
-		{
-			name: 'Customer Reviews',
-			icon: 'fa-solid fa-child-reaching'
-		},
-		{
-			name: 'Support',
-			icon: 'fa-solid fa-headset'
-		},
-		{
-			name: 'Follow Us on Instagram',
-			icon: 'fa-solid fa-brands fa-instagram'
-		},
-		{
-			name: 'Follow Us on X',
-			icon: 'fa-solid fa-brands fa-x-twitter'
-		}
+		{ name: 'Lesson Plans', icon: 'fa-solid fa-list-check', href: 'lesson-plans' },
+		{ name: 'CatClass Store', icon: 'fa-solid fa-cart-shopping' },
+		{ name: 'Customer Reviews', icon: 'fa-solid fa-child-reaching' },
+		{ name: 'Support', icon: 'fa-solid fa-headset' },
+		{ name: 'Follow Us on Instagram', icon: 'fa-solid fa-brands fa-instagram' },
+		{ name: 'Follow Us on X', icon: 'fa-solid fa-brands fa-x-twitter' }
 	];
+
+	// Function to handle "Start Learning" click
+	function handleStartLearning(event: Event) {
+		event.preventDefault();
+		const user = $page.data.user;
+		if (user) {
+			// User is logged in, navigate to /learning
+			goto('/learning');
+		} else {
+			// User is not logged in, navigate to /signup with a query parameter
+			goto('/login?redirect=/learning');
+		}
+	}
 </script>
 
 <main class="flex flex-1 flex-col p-4">
 	<section id="home" class="grid grid-cols-1 gap-10 py-8 sm:py-14 lg:grid-cols-1">
 		<div class="flex flex-col gap-6 text-center md:gap-8 lg:justify-center lg:gap-10">
 			<h2 class="text-4xl font-semibold sm:text-5xl md:text-6xl">
-				Hi! Welcome to <span class="poppins text-violet-400">Cat</span>Class
+				{#if $page.data.user}
+					Hi! {$page.data.user.username}, Welcome to <span class="poppins text-violet-400">Cat</span>Class
+				{:else}
+					Hi! Welcome to <span class="poppins text-violet-400">Cat</span>Class
+				{/if}
 				<div class="py-10">😻</div>
 			</h2>
 			<p class="text-base sm:text-lg md:text-xl">
@@ -48,18 +50,18 @@
 			</p>
 			<div class="relative grid place-items-center rounded-2xl">
 				<img
-					src={'images/profile.png'}
+					src="images/profile.png"
 					alt="profile image"
-					class="z-[2] max-h-[70vh]
-				object-cover"
+					class="z-[2] max-h-[70vh] object-cover"
 					aria-hidden="true"
 				/>
 			</div>
-			<a
+			<button
 				class="blueShadow poppins group relative mx-auto cursor-pointer
 				overflow-hidden rounded-full bg-slate-900 px-6 py-3 text-base 
 				text-white sm:text-lg md:text-xl lg:mr-auto"
-				href="/learning"
+				on:click|preventDefault={handleStartLearning}
+				on:keydown={(event) => event.key === 'Enter' && handleStartLearning(event)}
 			>
 				<div
 					class="absolute right-full top-0 z-0 h-full w-full
@@ -67,7 +69,7 @@
 				group-hover:translate-x-full"
 				></div>
 				<h4 class="z-9 relative text-white">Start Learning &rarr;</h4>
-			</a>
+			</button>
 		</div>
 	</section>
 
