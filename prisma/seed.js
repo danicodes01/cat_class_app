@@ -34,7 +34,7 @@ async function main() {
       description: 'Get started with our CatClass Free Package. Perfect for beginners looking to explore our platform.',
       planType: 'free',
       priceId: '',
-      endpoint: '/signup',
+      endpoint: '/register',
       image: 'images/teacherc.png',
       price: 0,
       features: {
